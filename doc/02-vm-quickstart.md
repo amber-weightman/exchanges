@@ -131,6 +131,8 @@ Username: root
 Password: linux
 ```
 
+> **⚠️ Unverified Information:** These credentials are based on typical OpenSUSE minimal VM defaults but have not been verified for this specific image. If these don't work, check the [official VM documentation](https://get.opensuse.org/leap/16.0/?type=server#download) or try accessing the VM console via Hyper-V to reset credentials.
+
 **⚠️ Security Note:** You MUST change this password immediately after first login.
 
 **Change root password:**

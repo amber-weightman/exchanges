@@ -75,6 +75,12 @@ ip addr show eth0 | grep "inet "
 
 Modern Windows (10/11) includes OpenSSH client by default.
 
+> **💡 Tip:** Consider using [Windows Terminal](https://aka.ms/terminal) for a better SSH experience. It provides:
+> - Modern terminal with tabs and split panes
+> - Better rendering and font support
+> - Copy/paste improvements
+> - Available free from Microsoft Store or `winget install Microsoft.WindowsTerminal`
+
 ### Step 1: Verify SSH Client is Available
 
 Open PowerShell and check:

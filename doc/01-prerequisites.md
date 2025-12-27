@@ -52,6 +52,17 @@ Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -NoRest
 
 Then restart your computer.
 
+## Verify Hyper-V Networking
+
+After enabling Hyper-V and restarting, check that a virtual switch exists:
+
+```powershell
+Get-VMSwitch
+```
+
+**Expected:** You should see at least one switch, typically "Default Switch" (created automatically by Windows).
+
+**If no switches exist:** The VM creation scripts will detect this and provide guidance. You can create a switch manually in Hyper-V Manager if needed (Settings → Virtual Switch Manager → New virtual network switch).
 
 ## Next Steps
 

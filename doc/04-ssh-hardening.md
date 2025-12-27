@@ -25,6 +25,17 @@ Before proceeding:
 - [ ] You have sudo privileges on the VM
 - [ ] You're connected via standard SSH or VS Code Remote-SSH
 
+## ⚠️ Create VM Checkpoint (Snapshot)
+
+**Important:** Before hardening SSH, create a Hyper-V checkpoint so you can rollback if something goes wrong.
+
+From Windows PowerShell:
+```powershell
+Checkpoint-VM -Name "OpenSUSE-Leap-16" -SnapshotName "Before-SSH-Hardening"
+```
+
+This allows you to restore if you accidentally lock yourself out.
+
 ## Backup Current Configuration
 
 Always back up before making changes:
@@ -60,7 +71,16 @@ Should show: `PermitRootLogin no`
 
 **Why:** Forces use of SSH keys, which are far more secure than passwords.
 
-**⚠️ CRITICAL:** Ensure key-based authentication is working before doing this!
+**⚠️ CRITICAL WARNING:** Once you disable password authentication:
+- **Only SSH keys will work** - password login will be permanently blocked
+- **If you lose your private key (`~/.ssh/id_ed25519`)** you will be locked out
+- **Keep your private key backed up securely** (never commit to git, never share)
+- You can still access VM via Hyper-V console if needed
+
+**Before proceeding, verify:**
+1. ✅ Key-based auth is working (test below)
+2. ✅ You know where your private key is stored (`%USERPROFILE%\.ssh\id_ed25519`)
+3. ✅ Your private key is backed up to a secure location
 
 **Test key-based auth first:**
 ```powershell
@@ -68,7 +88,7 @@ Should show: `PermitRootLogin no`
 ssh yourusername@<VM_IP_ADDRESS> 'echo "Key auth works!"'
 ```
 
-Only proceed if the above works without password prompt.
+**Only proceed if the above works without password prompt.**
 
 **Disable password authentication:**
 ```bash
@@ -94,21 +114,22 @@ grep "^ChallengeResponseAuthentication" /etc/ssh/sshd_config
 
 **Allow only specific users:**
 ```bash
-# Add at the end of sshd_config
-echo "AllowUsers yourusername" | sudo tee -a /etc/ssh/sshd_config
+# Add only if not already present
+grep -q "^AllowUsers" /etc/ssh/sshd_config || echo "AllowUsers yourusername" | sudo tee -a /etc/ssh/sshd_config
 ```
 
 **Or allow specific groups:**
 ```bash
-echo "AllowGroups wheel ssh-users" | sudo tee -a /etc/ssh/sshd_config
+# Add only if not already present
+grep -q "^AllowGroups" /etc/ssh/sshd_config || echo "AllowGroups wheel ssh-users" | sudo tee -a /etc/ssh/sshd_config
 ```
 
 ## Step 4: Configure SSH Protocol and Ciphers
 
 **Use only SSH Protocol 2:**
 ```bash
-# Should already be default, but verify
-echo "Protocol 2" | sudo tee -a /etc/ssh/sshd_config
+# Add only if not already present
+grep -q "^Protocol 2" /etc/ssh/sshd_config || echo "Protocol 2" | sudo tee -a /etc/ssh/sshd_config
 ```
 
 **Use strong ciphers only:**
@@ -126,33 +147,33 @@ EOF
 
 **Reduce login grace time:**
 ```bash
-# Disconnect if login not completed in 30 seconds
-sudo sed -i 's/^#LoginGraceTime 2m/LoginGraceTime 30/' /etc/ssh/sshd_config
-echo "LoginGraceTime 30" | sudo tee -a /etc/ssh/sshd_config
+# Uncomment if commented, otherwise add
+sudo sed -i 's/^#LoginGraceTime.*/LoginGraceTime 30/' /etc/ssh/sshd_config
+grep -q "^LoginGraceTime" /etc/ssh/sshd_config || echo "LoginGraceTime 30" | sudo tee -a /etc/ssh/sshd_config
 ```
 
 **Set maximum authentication attempts:**
 ```bash
-echo "MaxAuthTries 3" | sudo tee -a /etc/ssh/sshd_config
+grep -q "^MaxAuthTries" /etc/ssh/sshd_config || echo "MaxAuthTries 3" | sudo tee -a /etc/ssh/sshd_config
 ```
 
 **Set maximum sessions:**
 ```bash
-echo "MaxSessions 2" | sudo tee -a /etc/ssh/sshd_config
+grep -q "^MaxSessions" /etc/ssh/sshd_config || echo "MaxSessions 2" | sudo tee -a /etc/ssh/sshd_config
 ```
 
 **Client timeout (disconnects inactive sessions):**
 ```bash
-echo "ClientAliveInterval 300" | sudo tee -a /etc/ssh/sshd_config
-echo "ClientAliveCountMax 2" | sudo tee -a /etc/ssh/sshd_config
+grep -q "^ClientAliveInterval" /etc/ssh/sshd_config || echo "ClientAliveInterval 300" | sudo tee -a /etc/ssh/sshd_config
+grep -q "^ClientAliveCountMax" /etc/ssh/sshd_config || echo "ClientAliveCountMax 2" | sudo tee -a /etc/ssh/sshd_config
 ```
 
 ## Step 6: Disable Empty Passwords
 
 **Ensure no accounts with empty passwords can login:**
 ```bash
-sudo sed -i 's/^#PermitEmptyPasswords no/PermitEmptyPasswords no/' /etc/ssh/sshd_config
-echo "PermitEmptyPasswords no" | sudo tee -a /etc/ssh/sshd_config
+sudo sed -i 's/^#PermitEmptyPasswords.*/PermitEmptyPasswords no/' /etc/ssh/sshd_config
+grep -q "^PermitEmptyPasswords" /etc/ssh/sshd_config || echo "PermitEmptyPasswords no" | sudo tee -a /etc/ssh/sshd_config
 ```
 
 ## Step 7: Disable X11 Forwarding (If Not Needed)
@@ -168,7 +189,7 @@ sudo sed -i 's/^X11Forwarding yes/X11Forwarding no/' /etc/ssh/sshd_config
 **Ensure SSH logs are verbose:**
 ```bash
 sudo sed -i 's/^#LogLevel INFO/LogLevel VERBOSE/' /etc/ssh/sshd_config
-echo "LogLevel VERBOSE" | sudo tee -a /etc/ssh/sshd_config
+grep -q "^LogLevel" /etc/ssh/sshd_config || echo "LogLevel VERBOSE" | sudo tee -a /etc/ssh/sshd_config
 ```
 
 ## Step 9: Review Final Configuration

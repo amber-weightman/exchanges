@@ -196,7 +196,7 @@ try {
     Write-Host "1. Connect to VM console" -ForegroundColor White
     Write-Host "2. Login with root/linux" -ForegroundColor White
     Write-Host "3. Change root password: passwd" -ForegroundColor White
-    Write-Host "4. Follow doc/02-quickstart.md for initial configuration" -ForegroundColor White
+    Write-Host "4. Follow doc/02-vm-quickstart.md for initial configuration" -ForegroundColor White
     Write-Host ""
 
 } catch {

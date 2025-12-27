@@ -12,7 +12,7 @@
 
 > **About OS selection:** This project uses OpenSUSE Leap 16.0 (latest stable). While enterprises typically run older versions (SLES 15 series), the fundamental skills learned are 100% transferable. For background on distribution choices, see [Linux SUSE Distributions](resources/linux-distro.md).
 
-> **⚡ Quick Start Available:** For the fastest setup, see the **[Quick Start Guide](02-quickstart.md)** which uses a pre-built VM image (~192 MB download, ready in minutes). The instructions below are for traditional ISO installation.
+> **⚡ Quick Start Available:** For the fastest setup, see the **[Quick Start Guide](02-vm-quickstart.md)** which uses a pre-built VM image (~192 MB download, ready in minutes). The instructions below are for traditional ISO installation.
 
 **OpenSUSE Leap 16.0:**
 - Download: [OpenSUSE Leap 16.0](https://get.opensuse.org/leap/16.0/)
